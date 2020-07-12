@@ -50,9 +50,40 @@ const UserType = new GraphQLObjectType({
                 return axios.get(`${APIS_DOMAIN}/companies/${parentValue.companyId}`)
                     .then(response => response.data)
             }
+        },
+        tweets: {
+            type: new GraphQLList(TweetType),
+            resolve(parentValue) {
+                return axios.get(`${APIS_DOMAIN}/tweets?userId=${parentValue.id}`)
+                    .then(response => response.data)
+            }
         }
     })
 });
+
+const TweetType = new GraphQLObjectType({
+    name: 'Tweet',
+    fields: () => ({
+        id: {
+            type: GraphQLString
+        },
+        body: {
+            type: GraphQLString
+        },
+        date: {
+            type: GraphQLString
+        },
+        users: {
+            type: new GraphQLList(UserType),
+            resolve(parentValue) {
+                return axios.get(`${APIS_DOMAIN}/companies/${parentValue.id}/users`)
+                    .then(response => response.data)
+            }
+        }
+    })
+})
+
+
 
 const mutation = new GraphQLObjectType({
     name: 'Mutation',
@@ -130,6 +161,13 @@ const RootQuery = new GraphQLObjectType({
                     return axios.get(`${APIS_DOMAIN}/companies/${args.id}`)
                         .then(response => response.data)
                 }
+            }
+        },
+        tweets: {
+            type: new GraphQLList(TweetType),
+            resolve(parentValue, args) {
+                return axios.get(`${APIS_DOMAIN}/tweets`)
+                    .then(response => response.data)
             }
         }
     }
